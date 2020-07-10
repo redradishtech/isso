@@ -2,8 +2,11 @@
 # -*- encoding: utf-8 -*-
 
 import sys
+import subprocess
 
 from setuptools import setup, find_packages
+from distutils.command.build import build as _build
+import setuptools.command.build_py
 
 requires = ['itsdangerous', 'Jinja2', 'misaka>=2.0,<3.0', 'html5lib',
             'werkzeug>=1.0', 'bleach', 'flask-caching']
@@ -12,6 +15,17 @@ if sys.version_info < (3, ):
     raise SystemExit("Python 2 is not supported.")
 elif (3, 0) <= sys.version_info < (3, 4):
     raise SystemExit("Python 3 versions < 3.4 are not supported.")
+
+# On build, fetch our JS dependencies and build embed.min.js and friends. Ref. https://jichu4n.com/posts/how-to-add-custom-build-steps-and-commands-to-setuppy/
+class BuildPyCommand(setuptools.command.build_py.build_py):
+    """Custom build command."""
+
+    def run(self):
+        subprocess.call(
+              ['make', 'init', 'js']
+              )
+        setuptools.command.build_py.build_py.run(self)
+
 
 setup(
     name='isso',
@@ -40,5 +54,6 @@ setup(
     entry_points={
         'console_scripts':
             ['isso = isso:main'],
-    }
+    },
+    cmdclass={'build_py': BuildPyCommand}
 )
