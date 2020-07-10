@@ -17,3 +17,5 @@ include isso/templates/login.html
 include isso/css/admin.css
 include isso/css/isso.css
 include isso/img/isso.svg
+
+include Makefile
